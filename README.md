@@ -5,10 +5,12 @@ reviewable milestones.
 
 ## Current status
 
-The repository has completed **STEP 3 — First Real Model Provider**. `dreyze` can send text chat
-requests through an OpenAI-compatible provider using `DREYZE_API_KEY`, `DREYZE_BASE_URL`, and
-`DREYZE_MODEL`. The interactive session supports `/help` and `/exit`. Tool calls, streaming, and
-code modification are not implemented yet.
+The repository has completed **STEP 4 — Workspace Discovery**. `dreyze` can send text chat requests
+through an OpenAI-compatible provider using `DREYZE_API_KEY`, `DREYZE_BASE_URL`, and `DREYZE_MODEL`.
+The workspace layer can identify the canonical project path, find a Git root, and collect a
+lightweight top-level file and manifest snapshot without reading project files. The interactive
+session supports `/help` and `/exit`. Tool calls, streaming, and code modification are not
+implemented yet.
 
 ## Requirements
 
