@@ -5,9 +5,9 @@ reviewable milestones.
 
 ## Current status
 
-The repository is at **STEP 0 — Repository Foundation**. The `dreyze` command currently supports
-`--help` and `--version`. Interactive chat, model providers, tools, and code modification are not
-implemented yet.
+The repository is at **STEP 1 — Basic Interactive CLI**. Running `dreyze` starts a local echo
+session with `/help`, `/exit`, and Ctrl+C support. Model providers, tools, and code modification
+are not implemented yet.
 
 ## Requirements
 
@@ -27,11 +27,12 @@ pnpm test
 pnpm build
 ```
 
-To try the current CLI after building:
+To try the CLI after building:
 
 ```sh
 node dist/index.js --help
 node dist/index.js --version
+node dist/index.js
 ```
 
 ## License

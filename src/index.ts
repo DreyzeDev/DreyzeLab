@@ -4,12 +4,14 @@ import { Command } from 'commander';
 import { realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { handleSessionInput } from './cli/commands.js';
 import { runInteractiveSession } from './cli/interactive.js';
 
 const version = '0.0.1';
 
 export function createProgram(
-  startInteractiveSession: () => Promise<void> = runInteractiveSession,
+  startInteractiveSession: () => Promise<void> = () =>
+    runInteractiveSession({ handleInput: handleSessionInput }),
 ): Command {
   return new Command()
     .name('dreyze')
