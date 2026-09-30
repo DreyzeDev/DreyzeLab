@@ -1,8 +1,10 @@
 import { Readable, Writable } from 'node:stream';
 import { describe, expect, it } from 'vitest';
 import { createProgram } from '../src/index.js';
+import { createModelInputHandler } from '../src/cli/chat.js';
 import { handleSessionInput, helpText } from '../src/cli/commands.js';
 import { type InteractiveLineReader, runInteractiveSession } from '../src/cli/interactive.js';
+import type { ModelProvider } from '../src/providers/provider.js';
 
 function createOutputCapture(): { output: Writable; text: () => string } {
   let captured = '';
@@ -75,5 +77,23 @@ describe('interactive CLI session', () => {
     await program.parseAsync(['node', 'dreyze'], { from: 'node' });
 
     expect(started).toBe(true);
+  });
+
+  it('waits for a model-backed response before prompting again', async () => {
+    const capture = createOutputCapture();
+    const provider: ModelProvider = {
+      id: 'mock',
+      async complete() {
+        return { text: 'Model response.' };
+      },
+    };
+
+    await runInteractiveSession({
+      input: Readable.from(['hello\n/exit\n']),
+      output: capture.output,
+      handleInput: createModelInputHandler(provider, 'test-model'),
+    });
+
+    expect(capture.text()).toBe('DreyzeLab\n> Model response.\n> Goodbye.\n');
   });
 });
