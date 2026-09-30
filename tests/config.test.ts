@@ -16,6 +16,26 @@ describe('environment configuration', () => {
     });
   });
 
+  it('uses configured values instead of defaults and trims surrounding whitespace', () => {
+    expect(
+      loadEnvironmentConfig({
+        DREYZE_API_KEY: ' test-key ',
+        DREYZE_BASE_URL: ' http://127.0.0.1:11434/v1 ',
+        DREYZE_MODEL: ' local-model ',
+      }),
+    ).toEqual({
+      apiKey: 'test-key',
+      baseUrl: 'http://127.0.0.1:11434/v1',
+      model: 'local-model',
+    });
+  });
+
+  it('rejects a blank API key with a field-specific error', () => {
+    expect(() => loadEnvironmentConfig({ DREYZE_API_KEY: '   ' })).toThrow(
+      'DREYZE_API_KEY must not be empty.',
+    );
+  });
+
   it('reports invalid provider settings without echoing their values', () => {
     const secret = 'private-token-value';
 
