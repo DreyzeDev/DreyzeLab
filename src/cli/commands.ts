@@ -6,7 +6,7 @@ export const helpText = [
   '  /exit  End the session',
 ].join('\n');
 
-export const handleSessionInput: SessionInputHandler = (input: string): SessionInputResult => {
+export function handleBuiltInCommand(input: string): SessionInputResult | undefined {
   const normalizedInput = input.trim();
 
   if (normalizedInput === '/exit') {
@@ -21,5 +21,16 @@ export const handleSessionInput: SessionInputHandler = (input: string): SessionI
     return { type: 'continue' };
   }
 
+  return undefined;
+}
+
+export const handleSessionInput: SessionInputHandler = (input: string): SessionInputResult => {
+  const commandResult = handleBuiltInCommand(input);
+
+  if (commandResult !== undefined) {
+    return commandResult;
+  }
+
+  const normalizedInput = input.trim();
   return { type: 'continue', output: `Echo: ${normalizedInput}` };
 };

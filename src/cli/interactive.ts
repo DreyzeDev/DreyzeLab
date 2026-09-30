@@ -47,7 +47,7 @@ export async function runInteractiveSession(
 
   try {
     for await (const line of lineReader) {
-      const inputResult = handleInput(line);
+      const inputResult = await handleInput(line);
 
       if (inputResult.type === 'exit') {
         output.write('Goodbye.\n');

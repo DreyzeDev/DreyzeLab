@@ -5,10 +5,10 @@ reviewable milestones.
 
 ## Current status
 
-The repository has completed **STEP 2 — Config System**. The environment configuration loader
-validates `DREYZE_API_KEY`, `DREYZE_BASE_URL`, and `DREYZE_MODEL`. Running `dreyze` still starts a
-local echo session with `/help`, `/exit`, and Ctrl+C support; the settings are not connected to a
-model provider yet. Tools and code modification are not implemented.
+The repository has completed **STEP 3 — First Real Model Provider**. `dreyze` can send text chat
+requests through an OpenAI-compatible provider using `DREYZE_API_KEY`, `DREYZE_BASE_URL`, and
+`DREYZE_MODEL`. The interactive session supports `/help` and `/exit`. Tool calls, streaming, and
+code modification are not implemented yet.
 
 ## Requirements
 

@@ -1,6 +1,8 @@
 export type SessionInputResult = { type: 'continue'; output?: string } | { type: 'exit' };
 
-export type SessionInputHandler = (input: string) => SessionInputResult;
+export type SessionInputHandler = (
+  input: string,
+) => SessionInputResult | Promise<SessionInputResult>;
 
 export function echoSessionInput(input: string): SessionInputResult {
   const message = input.trim();
