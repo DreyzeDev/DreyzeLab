@@ -60,6 +60,69 @@ describe('OpenAI-compatible provider', () => {
     });
   });
 
+  it('sends JSON tool schemas and translates provider tool calls', async () => {
+    const fetchImplementation = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                content: null,
+                tool_calls: [
+                  {
+                    id: 'call_123',
+                    type: 'function',
+                    function: { name: 'read_file', arguments: '{"path":"src/app.ts"}' },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+    const provider = createProvider(fetchImplementation);
+    const tool = {
+      name: 'read_file',
+      description: 'Read a text file.',
+      inputSchema: {
+        type: 'object',
+        properties: { path: { type: 'string' } },
+        required: ['path'],
+      },
+    };
+
+    await expect(provider.complete({ ...request, tools: [tool] })).resolves.toEqual({
+      text: '',
+      toolCalls: [{ id: 'call_123', name: 'read_file', arguments: '{"path":"src/app.ts"}' }],
+    });
+
+    const call = fetchImplementation.mock.calls[0];
+    expect(call).toBeDefined();
+
+    if (call === undefined) {
+      throw new Error('Expected a provider request.');
+    }
+
+    const [, init] = call;
+    expect(JSON.parse(String(init?.body))).toEqual({
+      model: request.model,
+      messages: request.messages,
+      tools: [
+        {
+          type: 'function',
+          function: {
+            name: 'read_file',
+            description: 'Read a text file.',
+            parameters: tool.inputSchema,
+          },
+        },
+      ],
+      tool_choice: 'auto',
+    });
+  });
+
   it('maps authentication and rate-limit responses to typed errors', async () => {
     const unauthorizedProvider = createProvider(
       vi
@@ -95,6 +158,19 @@ describe('OpenAI-compatible provider', () => {
   it('rejects malformed success responses', async () => {
     const provider = createProvider(
       vi.fn<typeof fetch>().mockResolvedValue(new Response('not-json', { status: 200 })),
+    );
+
+    await expect(provider.complete(request)).rejects.toBeInstanceOf(ProviderResponseError);
+  });
+
+  it('rejects empty responses that contain neither text nor tool calls', async () => {
+    const provider = createProvider(
+      vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(JSON.stringify({ choices: [{ message: { content: null } }] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
     );
 
     await expect(provider.complete(request)).rejects.toBeInstanceOf(ProviderResponseError);
