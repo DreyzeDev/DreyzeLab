@@ -13,7 +13,21 @@ const completionResponseSchema = z.object({
   choices: z
     .array(
       z.object({
-        message: z.object({ content: z.string() }),
+        message: z.object({
+          content: z.string().nullable().optional(),
+          tool_calls: z
+            .array(
+              z.object({
+                id: z.string().min(1),
+                type: z.literal('function').optional(),
+                function: z.object({
+                  name: z.string().min(1),
+                  arguments: z.string(),
+                }),
+              }),
+            )
+            .optional(),
+        }),
       }),
     )
     .min(1),
@@ -75,6 +89,24 @@ export class OpenAICompatibleProvider implements ModelProvider {
   async complete(request: ModelRequest, signal?: AbortSignal): Promise<ModelResponse> {
     let response: Response;
 
+    const body = {
+      model: request.model,
+      messages: request.messages,
+      ...(request.tools === undefined || request.tools.length === 0
+        ? {}
+        : {
+            tools: request.tools.map((tool) => ({
+              type: 'function',
+              function: {
+                name: tool.name,
+                description: tool.description,
+                parameters: tool.inputSchema,
+              },
+            })),
+            tool_choice: 'auto',
+          }),
+    };
+
     try {
       response = await this.#fetch(this.#endpoint, {
         method: 'POST',
@@ -82,7 +114,7 @@ export class OpenAICompatibleProvider implements ModelProvider {
           Authorization: `Bearer ${this.#apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model: request.model, messages: request.messages }),
+        body: JSON.stringify(body),
         ...(signal === undefined ? {} : { signal }),
       });
     } catch (error) {
@@ -125,6 +157,22 @@ export class OpenAICompatibleProvider implements ModelProvider {
       throw new ProviderResponseError();
     }
 
-    return { text: choice.message.content };
+    const toolCalls = choice.message.tool_calls?.map(({ id, function: tool }) => ({
+      id,
+      name: tool.name,
+      arguments: tool.arguments,
+    }));
+
+    if (
+      (choice.message.content === undefined || choice.message.content === null) &&
+      (toolCalls?.length ?? 0) === 0
+    ) {
+      throw new ProviderResponseError();
+    }
+
+    return {
+      text: choice.message.content ?? '',
+      ...(toolCalls === undefined || toolCalls.length === 0 ? {} : { toolCalls }),
+    };
   }
 }
