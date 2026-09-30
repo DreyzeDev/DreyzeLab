@@ -5,12 +5,12 @@ reviewable milestones.
 
 ## Current status
 
-The repository has completed **STEP 4 — Workspace Discovery**. `dreyze` can send text chat requests
-through an OpenAI-compatible provider using `DREYZE_API_KEY`, `DREYZE_BASE_URL`, and `DREYZE_MODEL`.
-The workspace layer can identify the canonical project path, find a Git root, and collect a
-lightweight top-level file and manifest snapshot without reading project files. The interactive
-session supports `/help` and `/exit`. Tool calls, streaming, and code modification are not
-implemented yet.
+The repository has completed **STEP 5 — Read-only Tools**. The workspace layer can identify the
+canonical project path, find a Git root, and collect a lightweight top-level file and manifest
+snapshot. A tool registry exposes `read_file`, `list_directory`, `glob`, and `grep`, and the
+OpenAI-compatible provider can send their JSON schemas and return tool calls. The CLI does not
+execute model tool calls yet; the agent loop is the next milestone. File editing, shell execution,
+and streaming are not implemented yet.
 
 ## Requirements
 
