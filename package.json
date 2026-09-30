@@ -1,0 +1,38 @@
+{
+  "name": "dreyzelab",
+  "version": "0.0.1",
+  "description": "A terminal-first AI coding environment.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "dreyze": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DreyzeDev/DreyzeLab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DreyzeDev/DreyzeLab/issues"
+  },
+  "homepage": "https://github.com/DreyzeDev/DreyzeLab#readme",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "commander": "^14.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^6.0.3"
+  }
+}
